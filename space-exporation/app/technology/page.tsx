@@ -1,12 +1,24 @@
-"use client"
+"use client";
 
 import { useState, useEffect } from "react";
-import styles from './tech.module.css'
+import styles from './tech.module.css';
 
-function Technology()
-{
-    const [data, setData] = useState(null); // Use null to indicate the initial state before data is fetched
-    const [error, setError] = useState(null);
+interface Technology {
+    name: string;
+    description: string;
+    images: {
+        portrait: string;
+        landscape: string;
+    };
+}
+
+interface Data {
+    technology: Technology[];
+}
+
+function Technology() {
+    const [data, setData] = useState<Data | null>(null); // Use null to indicate the initial state before data is fetched
+    const [error, setError] = useState<Error | null>(null);
 
     useEffect(() => {
         fetch('/json/data.json') // Use a leading slash to ensure it's treated as a root-relative path
@@ -17,7 +29,7 @@ function Technology()
                 }
                 return response.json();
             })
-            .then(jsonData => {
+            .then((jsonData: Data) => {
                 console.log('Fetched data:', jsonData);
                 setData(jsonData);
             })
@@ -27,29 +39,31 @@ function Technology()
                 setData(null);
             });
     }, []);
-    return(
-        <div className={styles.page}>
-        <div className={styles.technology} id='destination'>
-            <div className={styles.crewtext}>
-                <h1>Our Crew</h1>
-                <p>Lorem ipsum, dolor sit amet consectetur adipisicing elit. Tempore aspernatur molestias doloremque esse odio atque voluptate facere, delectus rem distinctio commodi soluta aut autem est nemo dolorum obcaecati quae quo!</p>
-            </div>
-            {error ? (
-                <p>Error fetching data: {error.message}</p>
-            ) : !data ? (
-                <p>Loading...</p>
-            ) : (
-                data.technology.map(technology => (
-                    <div key={technology.name} className={styles.technologyItem}>
-                        <h2>{technology.name}</h2>
-                       <img src={technology.images.portrait} alt={technology.name} />
-                        <p>{technology.description}</p>
-                    
-                    </div>
-                ))
-            )}
+
+    const tech = data ? data.technology.map(technology => (
+        <div key={technology.name} className={styles.technologyItem}>
+            <h2>{technology.name}</h2>
+            <img src={technology.images.portrait} alt={technology.name} />
+            <p>{technology.description}</p>
         </div>
-    </div>
+    )) : null;
+
+    return (
+        <div className={styles.page}>
+            <div className={styles.technology} id='destination'>
+                <div className={styles.crewtext}>
+                    <h1>Our Crew</h1>
+                    <p>Lorem ipsum, dolor sit amet consectetur adipisicing elit. Tempore aspernatur molestias doloremque esse odio atque voluptate facere, delectus rem distinctio commodi soluta aut autem est nemo dolorum obcaecati quae quo!</p>
+                </div>
+                {error ? (
+                    <p>Error fetching data: {error.message}</p>
+                ) : !data ? (
+                    <p>Loading...</p>
+                ) : (
+                    tech
+                )}
+            </div>
+        </div>
     );
 }
 

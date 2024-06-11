@@ -1,30 +1,46 @@
 "use client";
 
-import styles from './about.module.css';
 import { useEffect, useState } from 'react';
+import styles from './about.module.css';
+
+// Define interfaces for the data
+interface Destination {
+  name: string;
+  images: {
+    png: string;
+  };
+  description: string;
+  distance: string;
+  travel: string;
+  class: string; // This assumes you have a class property in your data
+}
+
+interface Data {
+  destinations: Destination[];
+}
 
 export default function About() {
-  const [data, setData] = useState(null); // Use null to indicate the initial state before data is fetched
-  const [error, setError] = useState(null);
+  const [data, setData] = useState<Data | null>(null); // Use null to indicate the initial state before data is fetched
+  const [error, setError] = useState<Error | null>(null);
 
   useEffect(() => {
     fetch('/json/data.json') // Use a leading slash to ensure it's treated as a root-relative path
-    .then(response => {
-      console.log('Response status:', response.status);
-      if (!response.ok) {
-        throw new Error('Network response was not ok ' + response.statusText);
-      }
-      return response.json();
-    })
-    .then(jsonData => {
-      console.log('Fetched data:', jsonData);
-      setData(jsonData);
-    })
-    .catch(error => {
-      console.error('Error fetching the data:', error);
-      setError(error);
-      setData(null);
-    });
+      .then(response => {
+        console.log('Response status:', response.status);
+        if (!response.ok) {
+          throw new Error('Network response was not ok ' + response.statusText);
+        }
+        return response.json();
+      })
+      .then((jsonData: Data) => {
+        console.log('Fetched data:', jsonData);
+        setData(jsonData);
+      })
+      .catch(error => {
+        console.error('Error fetching the data:', error);
+        setError(error);
+        setData(null);
+      });
   }, []); // Empty dependency array ensures this runs only once after initial render
 
   return (

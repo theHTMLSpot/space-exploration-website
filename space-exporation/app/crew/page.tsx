@@ -3,9 +3,23 @@
 import { useState, useEffect } from 'react';
 import styles from './crew.module.css';
 
+// Define interfaces for the data
+interface CrewMember {
+    name: string;
+    images: {
+        png: string;
+    };
+    bio: string;
+    role: string;
+}
+
+interface Data {
+    crew: CrewMember[];
+}
+
 export default function Crew() {
-    const [data, setData] = useState(null); // Use null to indicate the initial state before data is fetched
-    const [error, setError] = useState(null);
+    const [data, setData] = useState<Data | null>(null); // Use null to indicate the initial state before data is fetched
+    const [error, setError] = useState<Error | null>(null);
 
     useEffect(() => {
         fetch('/json/data.json') // Use a leading slash to ensure it's treated as a root-relative path
@@ -16,7 +30,7 @@ export default function Crew() {
                 }
                 return response.json();
             })
-            .then(jsonData => {
+            .then((jsonData: Data) => {
                 console.log('Fetched data:', jsonData);
                 setData(jsonData);
             })
